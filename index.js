@@ -64,10 +64,11 @@ app.use(
       mongoUrl: MONGODB_URI,
       collectionName: "sessions",
     }),
-    cookie: {
+     cookie: {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
+      secure: true, // ✅ required for HTTPS (Render uses HTTPS)
+      sameSite: "none", // ✅ allows cookie sharing across domains
+      domain: ".vercel.app", // optional tweak for subdomains (see note below)
       maxAge: 1000 * 60 * 60 * 24, // 1 day
     },
   })
