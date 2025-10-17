@@ -13,7 +13,6 @@ const PORT = process.env.PORT || 4000;
 const FRONTEND_URL = process.env.FRONTEND_URL || "http://localhost:3000";
 
 // ---------- MongoDB Connection ----------
-// ---------- MongoDB Connection ----------
 const MONGODB_URI = process.env.MONGODB_URI || "mongodb://localhost:27017/erp";
 
 mongoose
@@ -21,8 +20,8 @@ mongoose
     useNewUrlParser: true,
     useUnifiedTopology: true,
     tls: true,
-    tlsAllowInvalidCertificates: true, // <--- this fixes Render handshake issue
-    serverSelectionTimeoutMS: 20000, // give enough time
+    tlsAllowInvalidCertificates: true, // fixes Render TLS handshake issue
+    serverSelectionTimeoutMS: 20000, // wait up to 20s before timeout
   })
   .then(() => console.log("✅ MongoDB connected successfully"))
   .catch((err) => {
@@ -30,9 +29,32 @@ mongoose
     console.error(err.message);
   });
 
+// ---------- CORS Configuration ----------
+const allowedOrigins = [
+  "http://localhost:3000",
+  "https://erp-demo-pi.vercel.app", // 👈 your Vercel frontend
+];
 
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        console.log("❌ Blocked by CORS:", origin);
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  })
+);
+
+// ---------- Body Parser ----------
 app.use(bodyParser.json());
 
+// ---------- Session Configuration ----------
 app.use(
   session({
     secret: process.env.SESSION_SECRET || "your-secret-key",
@@ -62,7 +84,7 @@ const admissionRoutes = require("./routes/admissions");
 const graduationNameChangeRoutes = require("./routes/Graduationnamechangeconfirmation");
 const inventoryRoutes = require("./routes/inventory");
 const staffRoutes = require("./routes/staff");
-const transferFundRoutes = require("./routes/transferfunds"); // corrected filename
+const transferFundRoutes = require("./routes/transferfunds");
 const depositRoutes = require("./routes/deposit");
 const attendanceRoutes = require("./routes/attendance");
 const teachingSubjectRoutes = require("./routes/teachingSubjects");
@@ -103,7 +125,7 @@ app.use("/api/attendance", attendanceRoutes);
 // ---------- Static Uploads ----------
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
-// ---------- Test Root Route ----------
+// ---------- Root Route ----------
 app.get("/", (_req, res) => {
   res.send("🎉 Welcome to the backend API");
 });
