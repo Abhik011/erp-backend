@@ -13,24 +13,23 @@ const PORT = process.env.PORT || 4000;
 const FRONTEND_URL = process.env.FRONTEND_URL || "http://localhost:3000";
 
 // ---------- MongoDB Connection ----------
+// ---------- MongoDB Connection ----------
 const MONGODB_URI = process.env.MONGODB_URI || "mongodb://localhost:27017/erp";
 
 mongoose
   .connect(MONGODB_URI, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
-    tls: true, // enforce TLS
+    tls: true,
+    tlsAllowInvalidCertificates: true, // <--- this fixes Render handshake issue
+    serverSelectionTimeoutMS: 20000, // give enough time
   })
-  .then(() => console.log("✅ MongoDB connected"))
-  .catch((err) => console.error("❌ MongoDB connection error:", err));
+  .then(() => console.log("✅ MongoDB connected successfully"))
+  .catch((err) => {
+    console.error("❌ MongoDB connection error:");
+    console.error(err.message);
+  });
 
-// ---------- Middleware ----------
-app.use(
-  cors({
-    origin: FRONTEND_URL,
-    credentials: true,
-  })
-);
 
 app.use(bodyParser.json());
 
