@@ -96,7 +96,7 @@ app.use("/api/inventory", inventoryRoutes);
 
 
 // Use Routes
-app.use("/api", authRoutes);
+app.use("/api/login", authRoutes);
 app.use("/api/profile", profileRoutes);
 
 // Test route
