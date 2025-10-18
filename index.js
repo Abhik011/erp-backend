@@ -132,6 +132,10 @@ app.get("/", (_req, res) => {
   res.send("🎉 Welcome to the backend API");
 });
 
+app.get("/api/debug-session", (req, res) => {
+  console.log("Session:", req.session);
+  res.json({ session: req.session });
+});
 // ---------- Start Server ----------
 app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
