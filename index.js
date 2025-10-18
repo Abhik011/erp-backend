@@ -32,7 +32,8 @@ mongoose
 // ---------- CORS Configuration ----------
 const allowedOrigins = [
   "http://localhost:3000",
-  "https://erp-demo-pi.vercel.app", // 👈 your Vercel frontend
+  "https://erp-demo-pi.vercel.app",
+   "https://erp-backend-ed55.onrender.com",// 👈 your Vercel frontend
 ];
 
 app.use(
