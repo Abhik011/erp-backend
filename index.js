@@ -58,6 +58,7 @@ app.use(bodyParser.json());
 // ---------- Session Configuration ----------
 app.use(
   session({
+    name: "erp.sid", // optional, custom cookie name
     secret: process.env.SESSION_SECRET || "your-secret-key",
     resave: false,
     saveUninitialized: false,
@@ -67,12 +68,13 @@ app.use(
     }),
     cookie: {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production", // ✅ Only true in production (HTTPS)
-      sameSite: "none", // Required for cross-site cookies
+      secure: process.env.NODE_ENV === "production", // true on Render
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
       maxAge: 1000 * 60 * 60 * 24, // 1 day
     },
   })
 );
+
 // ---------- Import Routes ----------
 const authRoutes = require("./routes/auth");
 const profileRoutes = require("./routes/profile");
