@@ -32,70 +32,40 @@ router.post("/signup", async (req, res) => {
 router.post("/login", async (req, res) => {
   try {
     const { institute, email, password } = req.body;
-
-    if (!institute || !email || !password) {
+    if (!institute || !email || !password)
       return res.status(400).json({ message: "All fields are required" });
-    }
 
     const user = await User.findOne({ email, institute });
-    if (!user) {
-      return res.status(404).json({ message: "User not found. Please sign up first." });
-    }
+    if (!user) return res.status(404).json({ message: "User not found" });
 
-    // ✅ compare with bcrypt (your signup hashes)
-    let ok = false;
-    try {
-      ok = await bcrypt.compare(password, user.password);
-    } catch (_) {
-      ok = false;
-    }
+    const ok = await bcrypt.compare(password, user.password);
+    if (!ok) return res.status(401).json({ message: "Incorrect password" });
 
-    // (Optional backward-compat: if old plaintext existed)
-    if (!ok && !/^\$2[aby]\$/.test(user.password)) {
-      ok = password === user.password;
-      if (ok) {
-        // migrate to bcrypt silently
-        user.password = await bcrypt.hash(password, 10);
-        await user.save();
-      }
-    }
-
-    if (!ok) {
-      return res.status(401).json({ message: "Incorrect password" });
-    }
-
-    // Build a safe user object (no password)
+    // ✅ Safe user object
     const safeUser = {
       id: user._id.toString(),
-      institute: user.institute,
+      _id: user._id.toString(),
       name: user.name,
       email: user.email,
+      institute: user.institute,
     };
 
-    // ✅ store user in session (kept your behavior but without password)
+    // store in session
     req.session.user = safeUser;
 
-    // ✅ ensure session is saved BEFORE responding
+    // save session before responding
     req.session.save((err) => {
-      if (err) {
-        console.error("Session save error:", err);
-        return res.status(500).json({ message: "Session save error" });
-      }
-
-      // 🔑 keep your session id log
-      console.log("Session ID:", req.sessionID);
-
-      return res.status(200).json({ message: "Login successful", user: safeUser });
+      if (err) return res.status(500).json({ message: "Session save error" });
+      console.log("Session saved:", req.sessionID);
+      res.status(200).json({ message: "Login successful", user: safeUser });
     });
 
-    // If you prefer stricter security, you can regenerate the session:
-    // req.session.regenerate((regenErr) => { ...same as above... });
-
-  } catch (error) {
-    console.error("Login error:", error);
+  } catch (err) {
+    console.error(err);
     res.status(500).json({ message: "Server error" });
   }
 });
+
 
 // ====================== LOGOUT ======================
 router.post("/logout", (req, res) => {
