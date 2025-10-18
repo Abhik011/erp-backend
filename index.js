@@ -66,15 +66,13 @@ app.use(
       collectionName: "sessions",
     }),
     cookie: {
-  httpOnly: true,
-  secure: process.env.NODE_ENV === "production", // only true in production
-  sameSite: "none",
-  maxAge: 1000 * 60 * 60 * 24,
-},
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production", // ✅ Only true in production (HTTPS)
+      sameSite: "none", // Required for cross-site cookies
+      maxAge: 1000 * 60 * 60 * 24, // 1 day
+    },
   })
 );
-
-
 // ---------- Import Routes ----------
 const authRoutes = require("./routes/auth");
 const profileRoutes = require("./routes/profile");
