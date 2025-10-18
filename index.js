@@ -66,11 +66,11 @@ app.use(
       collectionName: "sessions",
     }),
     cookie: {
-       httpOnly: true,
-      secure: true, // ✅ Always true in production over HTTPS
-      sameSite: "none", // ✅ Required for cross-site cookies
-      maxAge: 1000 * 60 * 60 * 24, // 1 day
-    },
+  httpOnly: true,
+  secure: process.env.NODE_ENV === "production", // only true in production
+  sameSite: "none",
+  maxAge: 1000 * 60 * 60 * 24,
+},
   })
 );
 
