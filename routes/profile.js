@@ -9,23 +9,22 @@ function getSessionUserId(req) {
 }
 
 // @route   GET /api/profile
-router.get('/', async (req, res) => {
-  const uid = getSessionUserId(req);
-  if (!uid) return res.status(401).json({ message: 'Please log in first' });
+router.get("/", async (req, res) => {
+  const uid = req.session?.user?.id || req.session?.user?._id;
+  if (!uid) return res.status(401).json({ message: "Please log in first" });
 
   try {
-    const user = await User.findById(uid).select('-password');
-    if (!user) return res.status(404).json({ message: 'User not found' });
+    const user = await User.findById(uid).select("-password");
+    if (!user) return res.status(404).json({ message: "User not found" });
 
-    // (optional) debug
-   console.log('GET /api/profile sid=', req.sessionID, 'user=', req.session.user);
-
-    res.status(200).json(user); // <-- your frontend expects the raw user object
+    console.log("Profile fetched, sessionID:", req.sessionID);
+    res.status(200).json(user);
   } catch (err) {
-    console.error('GET /api/profile error:', err);
-    res.status(500).json({ message: 'Server error' });
+    console.error(err);
+    res.status(500).json({ message: "Server error" });
   }
 });
+
 
 // @route   PUT /api/profile
 router.put('/', async (req, res) => {
