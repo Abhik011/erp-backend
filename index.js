@@ -66,9 +66,9 @@ app.use(
       collectionName: "sessions",
     }),
     cookie: {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production", // ✅ secure only in prod (HTTPS)
-      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+       httpOnly: true,
+      secure: true, // ✅ Always true in production over HTTPS
+      sameSite: "none", // ✅ Required for cross-site cookies
       maxAge: 1000 * 60 * 60 * 24, // 1 day
     },
   })
