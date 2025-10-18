@@ -18,7 +18,7 @@ router.get('/', async (req, res) => {
     if (!user) return res.status(404).json({ message: 'User not found' });
 
     // (optional) debug
-    // console.log('GET /api/profile sid=', req.sessionID, 'user=', req.session.user);
+   console.log('GET /api/profile sid=', req.sessionID, 'user=', req.session.user);
 
     res.status(200).json(user); // <-- your frontend expects the raw user object
   } catch (err) {
